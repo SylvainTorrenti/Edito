@@ -15,9 +15,8 @@ namespace Edito
 
         public DB()
         {
-            _dbConnection = new(Settings.Default.EditoConnectionString);            
+            _dbConnection = new(Settings.Default.EditoConnectionString);
         }
-
         #region Articles
 
         public IEnumerable<Article> GetArticles()
@@ -116,6 +115,39 @@ namespace Edito
             {
                 _dbConnection.Close();
             }
+        }
+        #endregion
+        #region Articles and NewsPaper
+        public IEnumerable<Association> GetArticlesAsso()
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "SELECT * from composition;";
+                return _dbConnection.Query<Association>(q);
+            }
+            finally { _dbConnection.Close(); }
+        }
+        public IEnumerable<Article> GetArticlesInNewspaper(int id)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "SELECT a.Titre , a.Corps , a.Auteur from article a join composition c on a.IDArticle = c.IDArticle join journal j on j.IDJournal = c.IDJournal WHERE c.IDJournal = @id";
+                return _dbConnection.Query<Article>(q, new { id });
+            }
+            finally { _dbConnection.Close(); }
+        }
+        public int InsertArticleInNewsPaper(int idNP, int idArticle)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "INSERT INTO composition (IDJournal, IDArticle) VALUES (@idNP, @idArticle);";
+                return _dbConnection.Execute(q, new { idNP, idArticle });
+
+            }
+            finally { _dbConnection.Close(); }
         }
         #endregion
     }

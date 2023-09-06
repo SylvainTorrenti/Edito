@@ -12,9 +12,12 @@ namespace Edito
 {
     public partial class frmMain : Form
     {
+        #region Initialize
         DB _db;
         BindingList<Article> _articles;
         BindingList<NewsPaper> _newsPapers;
+        BindingList<Article> _articlesInNewspaper;
+        BindingList<Association> _associations;
 
         public frmMain()
         {
@@ -40,7 +43,7 @@ namespace Edito
                 btNewsPaperRefresh.PerformClick();
             }
         }
-
+        #endregion
         #region Articles
 
         private void btArticleActualiser_Click(object sender, EventArgs e)
@@ -112,6 +115,9 @@ namespace Edito
             // On se repositionne sur le current
             if (current is not null)
                 bsArticles.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == current.IDJournal).FirstOrDefault());
+            var asso = _db.GetArticlesAsso();
+            foreach (Association a in asso)
+                _associations.Add(a);
         }
         private void btAddNP_Click(object sender, EventArgs e)
         {
@@ -207,6 +213,33 @@ namespace Edito
 
             }
         }
+        private void dgvNewsPaper_SelectionChanged(object sender, EventArgs e)
+        {
+            NewsPaper current = bsNewsPaper.Current as NewsPaper;
+            if (current is not null)
+            {
+                _articlesInNewspaper.Clear();
+                var ArticlesInNewspaper = _db.GetArticlesInNewspaper(current.IDJournal);
+                foreach (Article article in ArticlesInNewspaper)
+                    _articlesInNewspaper.Add(article);
+            }
+        }
+        #endregion
+        #region Articles and NewsPaper
+        private void btAddArticle_Click(object sender, EventArgs e)
+        {
+            NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+            Article currentArticle = bsArticles.Current as Article;
+            if (currentNP is not null && currentArticle is not null)
+            {
+                if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == currentArticle.IdArticle).Count() >= 1)
+                {
+                    MessageBox.Show("L'article que vous voulez entré dans le journal est déjà présent", "Erreur de creation", MessageBoxButtons.OK, MessageBoxIcon.Error); return;
+                }
+                _db.InsertArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
+                btNewsPaperRefresh.PerformClick();
+            }
+        }
         #endregion
         private void InitializeBinding()
         {
@@ -221,13 +254,19 @@ namespace Edito
             #endregion
             #region Binding NewsPaper
             _newsPapers = new BindingList<NewsPaper>();
+            _articlesInNewspaper = new BindingList<Article>();
+            bsArticleInNewspaper.DataSource = _articlesInNewspaper;
             bsNewsPaper.DataSource = _newsPapers;
             dgvNewsPaper.DataSource = bsNewsPaper;
             tbxTitleNewsPaper.DataBindings.Add("text", bsNewsPaper, "Titre", false, DataSourceUpdateMode.Never);
             dtpNewsPaper.DataBindings.Add("text", bsNewsPaper, "DtParution", false, DataSourceUpdateMode.Never);
             dgvAddArticle.DataSource = bsArticles;
-            dgvDeleteArticle.DataSource = bsArticles;
+            dgvDeleteArticle.DataSource = bsArticleInNewspaper;
+            dgvDeleteArticle.Columns["iDArticle"].Visible = false;
             #endregion
+            _associations = new BindingList<Association>();
         }
+
+
     }
 }

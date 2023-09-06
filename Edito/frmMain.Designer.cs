@@ -74,6 +74,7 @@
             tabCompositions = new TabPage();
             bsArticles = new BindingSource(components);
             bsNewsPaper = new BindingSource(components);
+            bsArticleInNewspaper = new BindingSource(components);
             tlpMain.SuspendLayout();
             tabEdito.SuspendLayout();
             tabArticles.SuspendLayout();
@@ -95,6 +96,7 @@
             tlpBoxNP.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)bsArticles).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).BeginInit();
             SuspendLayout();
             // 
             // tlpMain
@@ -404,6 +406,7 @@
             dgvNewsPaper.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvNewsPaper.Size = new Size(412, 366);
             dgvNewsPaper.TabIndex = 0;
+            dgvNewsPaper.SelectionChanged += dgvNewsPaper_SelectionChanged;
             // 
             // label4
             // 
@@ -445,6 +448,7 @@
             btAddArticle.Text = "Ajouter";
             btAddArticle.TextAlign = ContentAlignment.MiddleRight;
             btAddArticle.UseVisualStyleBackColor = true;
+            btAddArticle.Click += btAddArticle_Click;
             // 
             // gbxAddArticle
             // 
@@ -462,6 +466,7 @@
             dgvAddArticle.AllowUserToAddRows = false;
             dgvAddArticle.AllowUserToDeleteRows = false;
             dgvAddArticle.AllowUserToResizeRows = false;
+            dgvAddArticle.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvAddArticle.BackgroundColor = SystemColors.Control;
             dgvAddArticle.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvAddArticle.Dock = DockStyle.Fill;
@@ -490,6 +495,7 @@
             dgvDeleteArticle.AllowUserToAddRows = false;
             dgvDeleteArticle.AllowUserToDeleteRows = false;
             dgvDeleteArticle.AllowUserToResizeRows = false;
+            dgvDeleteArticle.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvDeleteArticle.BackgroundColor = SystemColors.Control;
             dgvDeleteArticle.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvDeleteArticle.Dock = DockStyle.Fill;
@@ -701,6 +707,7 @@
             tlpBoxNP.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)bsArticles).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -750,5 +757,6 @@
         private Label label5;
         private Label label6;
         private BindingSource bsNewsPaper;
+        private BindingSource bsArticleInNewspaper;
     }
 }
