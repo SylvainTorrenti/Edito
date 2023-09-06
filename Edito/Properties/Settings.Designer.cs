@@ -26,7 +26,7 @@ namespace Edito.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("server=localhost;uid=root;database=Edito")]
+        [global::System.Configuration.DefaultSettingValueAttribute("server=lab007.2isa.org;port=33007;UID=root;PWD=7852lab007;database=Edito")]
         public string EditoConnectionString {
             get {
                 return ((string)(this["EditoConnectionString"]));

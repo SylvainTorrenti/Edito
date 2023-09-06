@@ -25,7 +25,7 @@ namespace Edito
             try
             {
                 _dbConnection.Open();
-                var q = "SELECT * from Article";
+                var q = "SELECT * from article";
                 return _dbConnection.Query<Article>(q);
             }
             finally { _dbConnection.Close(); }
@@ -36,7 +36,7 @@ namespace Edito
             try
             {
                 _dbConnection.Open();
-                var q = "INSERT INTO Article (Titre,Corps,Auteur) VALUES (@titre, @corps, @auteur); SELECT LAST_INSERT_ID()";
+                var q = "INSERT INTO article (Titre,Corps,Auteur) VALUES (@titre, @corps, @auteur); SELECT LAST_INSERT_ID()";
                 var result = _dbConnection.Query<int>(q, new { titre, corps, auteur });
                 return result.Single();
             }
@@ -60,7 +60,7 @@ namespace Edito
             try
             {
                 _dbConnection.Open();
-                var q = "DELETE from Article WHERE IDArticle = @id";
+                var q = "DELETE from article WHERE IDArticle = @id";
                 var result = _dbConnection.Execute(q, new { id });
                 return result;
             }
@@ -68,5 +68,55 @@ namespace Edito
         }
 
         #endregion Articles
+        #region NewsPaper
+        public IEnumerable<NewsPaper> GetNewsPapers()
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "SELECT * from journal";
+                return _dbConnection.Query<NewsPaper>(q);
+            }
+            finally { _dbConnection.Close(); }
+        }
+        public int InsertNewsPaper(string Titre, DateTime? DtParution)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "INSERT INTO journal (Titre, DtParution) VALUES (@Titre, @DtParution); SELECT LAST_INSERT_ID() ";
+                var result = _dbConnection.Query<int>(q, new { Titre, DtParution });
+                return result.Single();
+            }
+            finally { _dbConnection.Close(); }
+        }
+        public int UpdateNewsPaper(int IDNewsPaper, string Titre, DateTime? DtParution)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var sql = "UPDATE journal SET Titre = @Titre, DtParution = @DtParution  WHERE IDJournal = @IDNewsPaper ;";
+                return _dbConnection.Execute(sql, new { IDNewsPaper, Titre, DtParution });
+
+            }
+            finally
+            {
+                _dbConnection.Close();
+            }
+        }
+        public int DeleteNewsPaper(int IDNewsPaper)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var sql = "DELETE FROM journal WHERE IDJournal = @IDNewsPaper;";
+                return _dbConnection.Execute(sql, new { IDNewsPaper });
+            }
+            finally
+            {
+                _dbConnection.Close();
+            }
+        }
+        #endregion
     }
 }
