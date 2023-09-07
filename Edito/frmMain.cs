@@ -40,7 +40,7 @@ namespace Edito
             }
             if (tabEdito.SelectedTab == tabJournaux)
             {
-                btNewsPaperRefresh.PerformClick();
+                btNPRefresh.PerformClick();
             }
         }
         #endregion
@@ -103,9 +103,9 @@ namespace Edito
 
         #endregion Articles
         #region NewsPaper
-        private void btRefresh_Click(object sender, EventArgs e)
+        private void btNPRefresh_Click(object sender, EventArgs e)
         {
-            // Sauvegarde du current
+
             NewsPaper current = bsArticles.Current as NewsPaper;
             // Remplissage de la liste
             _newsPapers.Clear();
@@ -118,6 +118,19 @@ namespace Edito
             var asso = _db.GetArticlesAsso();
             foreach (Association a in asso)
                 _associations.Add(a);
+            NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+            Article currentArticle = bsArticles.Current as Article;
+            var articles = _db.GetArticles();
+            _articles.Clear();
+            foreach (Article a in articles)
+                if (currentNP is not null && currentArticle is not null)
+                {
+                    if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == currentArticle.IdArticle).Count() < 1)
+                    {
+                        _articles.Add(a);
+                        return;
+                    }
+                }
         }
         private void btAddNP_Click(object sender, EventArgs e)
         {
@@ -130,7 +143,7 @@ namespace Edito
                 if (MessageBox.Show($"Confirmer la creation du journal \n nom : {tbxTitleNewsPaper.Text} \n date de parution {dtpNewsPaper.Text}", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     var idNewsPaper = _db.InsertNewsPaper(tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
-                    btNewsPaperRefresh.PerformClick();
+                    btNPRefresh.PerformClick();
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == idNewsPaper).FirstOrDefault());
                     return;
                 }
@@ -140,7 +153,7 @@ namespace Edito
                 if (MessageBox.Show($"Confirmer la creation du journal \n nom : {tbxTitleNewsPaper.Text} \n sans date de parution", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     var idNewsPaper = _db.InsertNewsPaper(tbxTitleNewsPaper.Text, null);
-                    btNewsPaperRefresh.PerformClick();
+                    btNPRefresh.PerformClick();
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == idNewsPaper).FirstOrDefault());
                     return;
                 }
@@ -169,7 +182,7 @@ namespace Edito
                                     _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, null);
                                     MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n Date de parution : Sans date", "Modifications effectuées");
                                 }
-                                btNewsPaperRefresh.PerformClick();
+                                btNPRefresh.PerformClick();
 
                             }
                         }
@@ -186,7 +199,7 @@ namespace Edito
                                 _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, null);
                                 MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n Date de parution : Sans date", "Modifications effectuées");
                             }
-                            btNewsPaperRefresh.PerformClick();
+                            btNPRefresh.PerformClick();
                         }
                     }
                     else if (dtpNewsPaper.Checked == false)
@@ -196,7 +209,7 @@ namespace Edito
                         {
                             MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n Date de parution : Sans date", "Modifications effectuées");
                         }
-                        btNewsPaperRefresh.PerformClick();
+                        btNPRefresh.PerformClick();
                     }
             }
         }
@@ -208,20 +221,33 @@ namespace Edito
                 if (MessageBox.Show($"Accepter la suppression du journal {current.Titre} ?", "Suprression", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     _db.DeleteNewsPaper(current.IDJournal);
-                    btNewsPaperRefresh.PerformClick();
+                    btNPRefresh.PerformClick();
                 }
-
             }
         }
-        private void dgvNewsPaper_SelectionChanged(object sender, EventArgs e)
+        private void bsNewsPaper_PositionChanged(object sender, EventArgs e)
         {
             NewsPaper current = bsNewsPaper.Current as NewsPaper;
             if (current is not null)
             {
+                _articles.Clear();
                 _articlesInNewspaper.Clear();
                 var ArticlesInNewspaper = _db.GetArticlesInNewspaper(current.IDJournal);
                 foreach (Article article in ArticlesInNewspaper)
                     _articlesInNewspaper.Add(article);
+                NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+                Article currentArticle = bsArticles.Current as Article;
+                var articles = _db.GetArticles();
+                _articles.Clear();
+                foreach (Article a in articles)
+                    if (currentNP is not null && currentArticle is not null)
+                    {
+                        if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == currentArticle.IdArticle).Count() < 1)
+                        {
+                            _articles.Add(a);
+                            return;
+                        }
+                    }
             }
         }
         #endregion
@@ -234,10 +260,32 @@ namespace Edito
             {
                 if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == currentArticle.IdArticle).Count() >= 1)
                 {
-                    MessageBox.Show("L'article que vous voulez entré dans le journal est déjà présent", "Erreur de creation", MessageBoxButtons.OK, MessageBoxIcon.Error); return;
+                    MessageBox.Show("L'article que vous voulez entré dans le journal est déjà présent", "Erreur de creation", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    _articles.Remove(currentArticle);
+                    return;
                 }
                 _db.InsertArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
-                btNewsPaperRefresh.PerformClick();
+                _articles.Remove(currentArticle);
+                _articles.Clear();
+                btNPRefresh.PerformClick();
+                bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
+            }
+        }
+        private void btDeleteArticle_Click(object sender, EventArgs e)
+        {
+            NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+            Article currentArticle = bsArticleInNewspaper.Current as Article;
+            Association currentAsso = bsAsso.Current as Association;
+            if (currentNP is not null)
+            {
+                if (currentAsso is not null)
+                {
+                    _db.DelteArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
+                    _articlesInNewspaper.Remove(currentArticle);
+                    _articles.Clear();
+                    btNPRefresh.PerformClick();
+                    bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
+                }
             }
         }
         #endregion
@@ -264,7 +312,10 @@ namespace Edito
             dgvDeleteArticle.DataSource = bsArticleInNewspaper;
             dgvDeleteArticle.Columns["iDArticle"].Visible = false;
             #endregion
+            #region Binding Association
             _associations = new BindingList<Association>();
+            bsAsso.DataSource = _associations;
+            #endregion
         }
 
 

@@ -70,11 +70,12 @@
             dtpNewsPaper = new DateTimePicker();
             label5 = new Label();
             label6 = new Label();
-            btNewsPaperRefresh = new Button();
+            btNPRefresh = new Button();
             tabCompositions = new TabPage();
             bsArticles = new BindingSource(components);
             bsNewsPaper = new BindingSource(components);
             bsArticleInNewspaper = new BindingSource(components);
+            bsAsso = new BindingSource(components);
             tlpMain.SuspendLayout();
             tabEdito.SuspendLayout();
             tabArticles.SuspendLayout();
@@ -97,6 +98,7 @@
             ((System.ComponentModel.ISupportInitialize)bsArticles).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bsAsso).BeginInit();
             SuspendLayout();
             // 
             // tlpMain
@@ -364,7 +366,7 @@
             tlpMainNewsPaper.Controls.Add(tlpDataGridView, 0, 0);
             tlpMainNewsPaper.Controls.Add(tlpMainArticle, 1, 0);
             tlpMainNewsPaper.Controls.Add(tlpSecondNewsPaper, 0, 1);
-            tlpMainNewsPaper.Controls.Add(btNewsPaperRefresh, 1, 1);
+            tlpMainNewsPaper.Controls.Add(btNPRefresh, 1, 1);
             tlpMainNewsPaper.Dock = DockStyle.Fill;
             tlpMainNewsPaper.Location = new Point(1, 1);
             tlpMainNewsPaper.Name = "tlpMainNewsPaper";
@@ -406,7 +408,6 @@
             dgvNewsPaper.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvNewsPaper.Size = new Size(412, 366);
             dgvNewsPaper.TabIndex = 0;
-            dgvNewsPaper.SelectionChanged += dgvNewsPaper_SelectionChanged;
             // 
             // label4
             // 
@@ -520,6 +521,7 @@
             btDeleteArticle.Text = "Supprimer";
             btDeleteArticle.TextAlign = ContentAlignment.MiddleRight;
             btDeleteArticle.UseVisualStyleBackColor = true;
+            btDeleteArticle.Click += btDeleteArticle_Click;
             // 
             // tlpSecondNewsPaper
             // 
@@ -643,19 +645,19 @@
             label6.Text = "Date de parution";
             label6.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // btNewsPaperRefresh
+            // btNPRefresh
             // 
-            btNewsPaperRefresh.Anchor = AnchorStyles.None;
-            btNewsPaperRefresh.Image = Properties.Resources.Synchroniser_48;
-            btNewsPaperRefresh.ImageAlign = ContentAlignment.MiddleLeft;
-            btNewsPaperRefresh.Location = new Point(556, 433);
-            btNewsPaperRefresh.Name = "btNewsPaperRefresh";
-            btNewsPaperRefresh.Size = new Size(189, 60);
-            btNewsPaperRefresh.TabIndex = 3;
-            btNewsPaperRefresh.Text = "Actualiser";
-            btNewsPaperRefresh.TextAlign = ContentAlignment.MiddleRight;
-            btNewsPaperRefresh.UseVisualStyleBackColor = true;
-            btNewsPaperRefresh.Click += btRefresh_Click;
+            btNPRefresh.Anchor = AnchorStyles.None;
+            btNPRefresh.Image = Properties.Resources.Synchroniser_48;
+            btNPRefresh.ImageAlign = ContentAlignment.MiddleLeft;
+            btNPRefresh.Location = new Point(556, 433);
+            btNPRefresh.Name = "btNPRefresh";
+            btNPRefresh.Size = new Size(189, 60);
+            btNPRefresh.TabIndex = 3;
+            btNPRefresh.Text = "Actualiser";
+            btNPRefresh.TextAlign = ContentAlignment.MiddleRight;
+            btNPRefresh.UseVisualStyleBackColor = true;
+            btNPRefresh.Click += btNPRefresh_Click;
             // 
             // tabCompositions
             // 
@@ -667,6 +669,10 @@
             tabCompositions.Size = new Size(880, 536);
             tabCompositions.TabIndex = 2;
             tabCompositions.Text = "Compositions";
+            // 
+            // bsNewsPaper
+            // 
+            bsNewsPaper.PositionChanged += bsNewsPaper_PositionChanged;
             // 
             // frmMain
             // 
@@ -708,6 +714,7 @@
             ((System.ComponentModel.ISupportInitialize)bsArticles).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bsAsso).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -753,10 +760,11 @@
         private TableLayoutPanel tlpBoxNP;
         private TextBox tbxTitleNewsPaper;
         private DateTimePicker dtpNewsPaper;
-        private Button btNewsPaperRefresh;
+        private Button btNPRefresh;
         private Label label5;
         private Label label6;
         private BindingSource bsNewsPaper;
         private BindingSource bsArticleInNewspaper;
+        private BindingSource bsAsso;
     }
 }

@@ -133,7 +133,7 @@ namespace Edito
             try
             {
                 _dbConnection.Open();
-                var q = "SELECT a.Titre , a.Corps , a.Auteur from article a join composition c on a.IDArticle = c.IDArticle join journal j on j.IDJournal = c.IDJournal WHERE c.IDJournal = @id";
+                var q = "SELECT a.IDArticle , a.Titre , a.Corps , a.Auteur from article a join composition c on a.IDArticle = c.IDArticle join journal j on j.IDJournal = c.IDJournal WHERE c.IDJournal = @id";
                 return _dbConnection.Query<Article>(q, new { id });
             }
             finally { _dbConnection.Close(); }
@@ -144,6 +144,17 @@ namespace Edito
             {
                 _dbConnection.Open();
                 var q = "INSERT INTO composition (IDJournal, IDArticle) VALUES (@idNP, @idArticle);";
+                return _dbConnection.Execute(q, new { idNP, idArticle });
+
+            }
+            finally { _dbConnection.Close(); }
+        }
+        public int DelteArticleInNewsPaper(int idNP, int idArticle)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "DELETE FROM composition WHERE IDJournal = @idNP AND IDArticle = @idArticle;";
                 return _dbConnection.Execute(q, new { idNP, idArticle });
 
             }
