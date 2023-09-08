@@ -41,6 +41,18 @@ namespace Edito
             if (tabEdito.SelectedTab == tabJournaux)
             {
                 btNPRefresh.PerformClick();
+                _articles.Clear();
+                NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+                Article currentArticle = bsArticles.Current as Article;
+                var articles = _db.GetArticles();
+                foreach (Article a in articles)
+                    if (currentNP is not null)
+                    {
+                        if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
+                        {
+                            _articles.Add(a);
+                        }
+                    }
             }
         }
         #endregion
@@ -125,10 +137,9 @@ namespace Edito
             foreach (Article a in articles)
                 if (currentNP is not null && currentArticle is not null)
                 {
-                    if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == currentArticle.IdArticle).Count() < 1)
+                    if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
                     {
                         _articles.Add(a);
-                        return;
                     }
                 }
         }
@@ -235,19 +246,19 @@ namespace Edito
                 var ArticlesInNewspaper = _db.GetArticlesInNewspaper(current.IDJournal);
                 foreach (Article article in ArticlesInNewspaper)
                     _articlesInNewspaper.Add(article);
+                _articles.Clear();
                 NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
                 Article currentArticle = bsArticles.Current as Article;
                 var articles = _db.GetArticles();
-                _articles.Clear();
                 foreach (Article a in articles)
-                    if (currentNP is not null && currentArticle is not null)
+                    if (currentNP is not null)
                     {
-                        if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == currentArticle.IdArticle).Count() < 1)
+                        if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
                         {
                             _articles.Add(a);
-                            return;
                         }
                     }
+
             }
         }
         #endregion
