@@ -65,6 +65,17 @@ namespace Edito
             }
             finally { _dbConnection.Close(); }
         }
+        public long ArticleIsPresent(int id)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "SELECT COUNT(c.IDArticle) from composition c join article a ON c.IDArticle = a.IDArticle WHERE a.IDArticle = @id;";
+                var result = _dbConnection.ExecuteScalar(q, new { id });
+                return (long)result;
+            }
+            finally { _dbConnection.Close(); }
+        }
 
         #endregion Articles
         #region NewsPaper
@@ -110,6 +121,20 @@ namespace Edito
                 _dbConnection.Open();
                 var sql = "DELETE FROM journal WHERE IDJournal = @IDNewsPaper;";
                 return _dbConnection.Execute(sql, new { IDNewsPaper });
+            }
+            finally
+            {
+                _dbConnection.Close();
+            }
+        }
+        public long NewsPaperIspresent(int IDNewsPaper)
+        {
+            try
+            {
+                _dbConnection.Open();
+                var q = "SELECT COUNT(c.IDJournal) FROM composition c join journal j ON c.IDJournal = j.IDJournal WHERE j.IDJournal = @IDNewsPaper;";
+                var result = _dbConnection.ExecuteScalar(q, new { IDNewsPaper });
+                return (long)result;
             }
             finally
             {

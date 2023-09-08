@@ -105,7 +105,11 @@ namespace Edito
             {
                 if (MessageBox.Show($"Confirmez vous la suppression de l'article {current.Titre} ?", "Supprimer", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
-                    // Requête classique
+                    if (_db.ArticleIsPresent(current.IdArticle) > 0)
+                    {
+                        MessageBox.Show($"L'article {current.Titre} est present dans un journal. Veuillez l'enlever du journal avant la supression", "Echec de supression", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                     var nb = _db.DeleteArticle(current.IdArticle);
                     btArticleRefresh.PerformClick();
                 }
@@ -128,6 +132,7 @@ namespace Edito
             if (current is not null)
                 bsArticles.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == current.IDJournal).FirstOrDefault());
             var asso = _db.GetArticlesAsso();
+            _associations.Clear();
             foreach (Association a in asso)
                 _associations.Add(a);
             NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
@@ -135,7 +140,7 @@ namespace Edito
             var articles = _db.GetArticles();
             _articles.Clear();
             foreach (Article a in articles)
-                if (currentNP is not null && currentArticle is not null)
+                if (currentNP is not null)
                 {
                     if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
                     {
@@ -231,6 +236,11 @@ namespace Edito
             {
                 if (MessageBox.Show($"Accepter la suppression du journal {current.Titre} ?", "Suprression", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
+                    if (_db.NewsPaperIspresent(current.IDJournal) > 0)
+                    {
+                        MessageBox.Show($"Le journal {current.Titre} est posséde des articles. Veuillez les enlever du journal avant la supression.", "Echec de supression", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                     _db.DeleteNewsPaper(current.IDJournal);
                     btNPRefresh.PerformClick();
                 }
@@ -256,6 +266,7 @@ namespace Edito
                         if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
                         {
                             _articles.Add(a);
+
                         }
                     }
 
@@ -269,15 +280,8 @@ namespace Edito
             Article currentArticle = bsArticles.Current as Article;
             if (currentNP is not null && currentArticle is not null)
             {
-                if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == currentArticle.IdArticle).Count() >= 1)
-                {
-                    MessageBox.Show("L'article que vous voulez entré dans le journal est déjà présent", "Erreur de creation", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    _articles.Remove(currentArticle);
-                    return;
-                }
                 _db.InsertArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
                 _articles.Remove(currentArticle);
-                _articles.Clear();
                 btNPRefresh.PerformClick();
                 bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
             }
@@ -293,11 +297,12 @@ namespace Edito
                 {
                     _db.DelteArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
                     _articlesInNewspaper.Remove(currentArticle);
-                    _articles.Clear();
-                    btNPRefresh.PerformClick();
+                    _associations.Remove(currentAsso);
+                    _articles.Add(currentArticle);               
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
                 }
             }
+            btNPRefresh.PerformClick();
         }
         #endregion
         private void InitializeBinding()
