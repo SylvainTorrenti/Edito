@@ -76,6 +76,9 @@
             bsNewsPaper = new BindingSource(components);
             bsArticleInNewspaper = new BindingSource(components);
             bsAsso = new BindingSource(components);
+            tlpView = new TableLayoutPanel();
+            dgvView = new DataGridView();
+            bsView = new BindingSource(components);
             tlpMain.SuspendLayout();
             tabEdito.SuspendLayout();
             tabArticles.SuspendLayout();
@@ -95,10 +98,14 @@
             tlpSecondNewsPaper.SuspendLayout();
             flpNPButton.SuspendLayout();
             tlpBoxNP.SuspendLayout();
+            tabCompositions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)bsArticles).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsAsso).BeginInit();
+            tlpView.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)bsView).BeginInit();
             SuspendLayout();
             // 
             // tlpMain
@@ -662,6 +669,7 @@
             // tabCompositions
             // 
             tabCompositions.BackColor = SystemColors.Control;
+            tabCompositions.Controls.Add(tlpView);
             tabCompositions.Location = new Point(4, 27);
             tabCompositions.Margin = new Padding(1);
             tabCompositions.Name = "tabCompositions";
@@ -673,6 +681,33 @@
             // bsNewsPaper
             // 
             bsNewsPaper.PositionChanged += bsNewsPaper_PositionChanged;
+            // 
+            // tlpView
+            // 
+            tlpView.ColumnCount = 1;
+            tlpView.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tlpView.Controls.Add(dgvView, 0, 0);
+            tlpView.Dock = DockStyle.Fill;
+            tlpView.Location = new Point(1, 1);
+            tlpView.Name = "tlpView";
+            tlpView.RowCount = 1;
+            tlpView.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tlpView.Size = new Size(878, 534);
+            tlpView.TabIndex = 0;
+            // 
+            // dgvView
+            // 
+            dgvView.AllowUserToAddRows = false;
+            dgvView.AllowUserToDeleteRows = false;
+            dgvView.BackgroundColor = SystemColors.Control;
+            dgvView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvView.Dock = DockStyle.Fill;
+            dgvView.Location = new Point(3, 3);
+            dgvView.Name = "dgvView";
+            dgvView.ReadOnly = true;
+            dgvView.RowTemplate.Height = 25;
+            dgvView.Size = new Size(872, 528);
+            dgvView.TabIndex = 0;
             // 
             // frmMain
             // 
@@ -711,10 +746,14 @@
             flpNPButton.ResumeLayout(false);
             tlpBoxNP.ResumeLayout(false);
             tlpBoxNP.PerformLayout();
+            tabCompositions.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)bsArticles).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsAsso).EndInit();
+            tlpView.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)bsView).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -766,5 +805,8 @@
         private BindingSource bsNewsPaper;
         private BindingSource bsArticleInNewspaper;
         private BindingSource bsAsso;
+        private TableLayoutPanel tlpView;
+        private DataGridView dgvView;
+        private BindingSource bsView;
     }
 }

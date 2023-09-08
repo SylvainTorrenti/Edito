@@ -298,7 +298,7 @@ namespace Edito
                     _db.DelteArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
                     _articlesInNewspaper.Remove(currentArticle);
                     _associations.Remove(currentAsso);
-                    _articles.Add(currentArticle);               
+                    _articles.Add(currentArticle);
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
                 }
             }

@@ -13,10 +13,12 @@ namespace Edito
     {
         private readonly MySqlConnection _dbConnection;
 
+        #region Connection
         public DB()
         {
             _dbConnection = new(Settings.Default.EditoConnectionString);
-        }
+        } 
+        #endregion
         #region Articles
 
         public IEnumerable<Article> GetArticles()
