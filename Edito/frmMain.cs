@@ -149,49 +149,61 @@ namespace Edito
         #region NewsPaper
         private void btNPRefresh_Click(object sender, EventArgs e)
         {
-
+            // creation du current
             NewsPaper current = bsArticles.Current as NewsPaper;
-            // Remplissage de la liste
+            // Remplissage de la liste de journaux
             _newsPapers.Clear();
             var NewsPaper = _db.GetNewsPapers();
             foreach (NewsPaper j in NewsPaper)
                 _newsPapers.Add(j);
             // On se repositionne sur le current
             if (current is not null)
-                bsArticles.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == current.IDJournal).FirstOrDefault());
+                bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == current.IDJournal).FirstOrDefault());
+            // Remplissage de la liste d'association
             var asso = _db.GetArticlesAsso();
             _associations.Clear();
             foreach (Association a in asso)
                 _associations.Add(a);
+            // Remplissage de la liste d'article
             NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
             Article currentArticle = bsArticles.Current as Article;
             var articles = _db.GetArticles();
             _articles.Clear();
-            foreach (Article a in articles)
-                if (currentNP is not null)
-                {
+            // on verifie que currentNP n'est pas null
+            if (currentNP is not null)
+            {
+                foreach (Article a in articles)
+                    // Pour chaque Article on verifie sa presence dans le journal selectionné grâce à la liste _association
                     if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
                     {
                         _articles.Add(a);
                     }
-                }
+            }
         }
         private void btAddNP_Click(object sender, EventArgs e)
         {
+            // Verifie si le journal qui doit être créé existe déjà
             if (_newsPapers.Where(newspaper => newspaper.Titre == tbxTitleNewsPaper.Text && newspaper.DtParution == dtpNewsPaper.Value).Count() >= 1 || _newsPapers.Where(newspaper => newspaper.Titre == tbxTitleNewsPaper.Text && newspaper.DtParution == null).Count() >= 1)
             {
+                // si le journal existe déjà un message l'indique a l'utilisateur
                 MessageBox.Show("Le journal que vous voulez créé existe déjà", "Erreur de creation", MessageBoxButtons.OK, MessageBoxIcon.Error); return;
             }
+            // Verification du check du Date Time Picker
             if (dtpNewsPaper.Checked == true)
             {
+                // Un message avec un récapitulatife des information demande à l'utilisateur la validation de la creation 
                 if (MessageBox.Show($"Confirmer la creation du journal \n nom : {tbxTitleNewsPaper.Text} \n date de parution {dtpNewsPaper.Text}", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
+                    // appel de la fonction InsertNewsPaper avec les information requise
                     var idNewsPaper = _db.InsertNewsPaper(tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
+                    // La simulation du click sur le bouton btNPRefresh permet d'avoir une actualisation directement aprés la création sans que l'utilisateur n'ai à appuyer sur le bouton
                     btNPRefresh.PerformClick();
+                    // Positionement sur le journal qui vient d'être créé
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == idNewsPaper).FirstOrDefault());
                     return;
                 }
             }
+            // Même commentaire que pour le if precedent
             else
             {
                 if (MessageBox.Show($"Confirmer la creation du journal \n nom : {tbxTitleNewsPaper.Text} \n sans date de parution", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
@@ -205,17 +217,24 @@ namespace Edito
         }
         private void btUpdateNP_Click(object sender, EventArgs e)
         {
+            // creation du current
             NewsPaper current = bsNewsPaper.Current as NewsPaper;
+            // Verifie que la current n'est pas null
             if (current is not null)
             {
+                //Demande de confirmation à l'utilisateur pour la modification
                 if (MessageBox.Show($"Confirmer la modification du journal {current.Titre} ?", "Modification", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                    //verification du check du Date Time Picker du journal comme il apparait en BDD
                     if (dtpNewsPaper.Checked == true)
                     {
+                        //verification du check du Date Time Picker du current
                         if (current.DtParution == null)
                         {
+                            //Verification de l'execution de la requête
                             var nb2 = _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
                             if (nb2 == 1)
                             {
+                                // Mise en place d'un message recapitulatif selon le check du Date Time Picker
                                 if (dtpNewsPaper.Checked == true)
                                 {
                                     MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n  \n Date de naissance : {dtpNewsPaper.Text}", "Modifications effectuées");
@@ -259,38 +278,50 @@ namespace Edito
         }
         private void btDeleteNP_Click(object sender, EventArgs e)
         {
+            // creation du current
             NewsPaper current = bsNewsPaper.Current as NewsPaper;
+            // Verifie que la current n'est pas null
             if (current is not null)
             {
+                // Message de confirmation de la supression du journal
                 if (MessageBox.Show($"Accepter la suppression du journal {current.Titre} ?", "Suprression", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
+                    // Si lu'itlisateur decide de le supprimer alors il y a verification qu'il ne posséde pas des articles
                     if (_db.NewsPaperIspresent(current.IDJournal) > 0)
                     {
                         MessageBox.Show($"Le journal {current.Titre} est posséde des articles. Veuillez les enlever du journal avant la supression.", "Echec de supression", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
+                    //Supression de l'article si il a passer les conditions precedentes
                     _db.DeleteNewsPaper(current.IDJournal);
+                    // La simulation du click sur le bouton btNPRefresh permet d'avoir une actualisation directement aprés la création sans que l'utilisateur n'ai à appuyer sur le bouton
                     btNPRefresh.PerformClick();
                 }
             }
         }
         private void bsNewsPaper_PositionChanged(object sender, EventArgs e)
         {
-            NewsPaper current = bsNewsPaper.Current as NewsPaper;
-            if (current is not null)
+            // creation du current NewsPaper
+            NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+            // Verifie que la current n'est pas null
+            if (currentNP is not null)
             {
+                // supprime les éléments present dans les liste _articles et _articlesInNewspaper
                 _articles.Clear();
                 _articlesInNewspaper.Clear();
-                var ArticlesInNewspaper = _db.GetArticlesInNewspaper(current.IDJournal);
+                // Récupére les articles present dans le journal selectionner
+                var ArticlesInNewspaper = _db.GetArticlesInNewspaper(currentNP.IDJournal);
                 foreach (Article article in ArticlesInNewspaper)
+                    // Les ajoute à la liste _articlesInNewspaper
                     _articlesInNewspaper.Add(article);
                 _articles.Clear();
-                NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+                // creation du curren Article
                 Article currentArticle = bsArticles.Current as Article;
                 var articles = _db.GetArticles();
                 foreach (Article a in articles)
                     if (currentNP is not null)
                     {
+                        // ajoute les article dans _articles si il ne sont pas deja present
                         if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
                         {
                             _articles.Add(a);
