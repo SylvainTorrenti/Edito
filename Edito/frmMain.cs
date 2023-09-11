@@ -385,6 +385,7 @@ namespace Edito
         private void InitializeBinding()
         {
             #region Binding Article
+            
             _articles = new BindingList<Article>();
             bsArticles.DataSource = _articles;
             dgvArticles.DataSource = bsArticles;
