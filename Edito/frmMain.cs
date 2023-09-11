@@ -335,32 +335,50 @@ namespace Edito
         #region Articles and NewsPaper
         private void btAddArticle_Click(object sender, EventArgs e)
         {
+            // creation du current NewsPaper
             NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+            // creation du current Article
             Article currentArticle = bsArticles.Current as Article;
+            // Verification que les current ne sont pas null
             if (currentNP is not null && currentArticle is not null)
             {
+                // insertion de l'article
                 _db.InsertArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
+                // suprression de l'article dans _articles
                 _articles.Remove(currentArticle);
+                // La simulation du click sur le bouton btNPRefresh permet d'avoir une actualisation directement aprés la création sans que l''utilisateur n'ai à appuyer sur le bouton
                 btNPRefresh.PerformClick();
+                // Positionement sur le journal
                 bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
             }
         }
         private void btDeleteArticle_Click(object sender, EventArgs e)
         {
+            // creation du current NewsPaper
             NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
+            // creation du current Article
             Article currentArticle = bsArticleInNewspaper.Current as Article;
+            // creation du current Association
             Association currentAsso = bsAsso.Current as Association;
+            //verification que currentNP n'est pas null
             if (currentNP is not null)
             {
+                //verification que currentAsso n'est pas null
                 if (currentAsso is not null)
                 {
+                    // supprime l'association entre l'article et le journal dans la BDD
                     _db.DelteArticleInNewsPaper(currentNP.IDJournal, currentArticle.IdArticle);
+                    // supprime l'article dans la liste des articles present dans la journal
                     _articlesInNewspaper.Remove(currentArticle);
+                    // supprime l'association entre l'article et le journal dans _associations
                     _associations.Remove(currentAsso);
+                    // ajoute l'article supprimé de la liste des article dans la journal dans la liste des articles
                     _articles.Add(currentArticle);
+                    // Positionement sur le journal
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
                 }
             }
+            // La simulation du click sur le bouton btNPRefresh permet d'avoir une actualisation directement aprés la création sans que l''utilisateur n'ai à appuyer sur le bouton
             btNPRefresh.PerformClick();
         }
         #endregion
