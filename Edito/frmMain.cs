@@ -129,15 +129,13 @@ namespace Edito
                 // Message de confirmation de la supression de l'article
                 if (MessageBox.Show($"Confirmez vous la suppression de l'article {current.Titre} ?", "Supprimer", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
-                    // Si lu'itlisateur decide de le supprimer alors il y a verification qu'il n'apparait pas dans un journal
-                    if (_db.ArticleIsPresent(current.IdArticle) > 0)
+                    //Supression de l'article si il est pas présent dans un journal
+                    var nb = _db.DeleteArticleIfNotExist(current.IdArticle);
+                    if (nb == 0)
                     {
-                        // Si l'article est present dans un journal un message d'erreur apparait et l'article n'est pas supprimer
                         MessageBox.Show($"L'article {current.Titre} est present dans un journal. Veuillez l'enlever du journal avant la supression", "Echec de supression", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
-                    //Supression de l'article si il à passer les conditions precedentes
-                    _db.DeleteArticle(current.IdArticle);
                     // La simulation du click sur le bouton btArticleRefresh permet d'avoir une actualisation directement aprés la création sans que l''utilisateur n'ai à appuyer sur le bouton
                     btArticleRefresh.PerformClick();
                 }
@@ -287,13 +285,7 @@ namespace Edito
                 if (MessageBox.Show($"Accepter la suppression du journal {current.Titre} ?", "Suprression", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     // Si lu'itlisateur decide de le supprimer alors il y a verification qu'il ne posséde pas des articles
-                    if (_db.NewsPaperIspresent(current.IDJournal) > 0)
-                    {
-                        MessageBox.Show($"Le journal {current.Titre} est posséde des articles. Veuillez les enlever du journal avant la supression.", "Echec de supression", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    //Supression de l'article si il a passer les conditions precedentes
-                    _db.DeleteNewsPaper(current.IDJournal);
+                    _db.DeleteNewsPaperCascade(current.IDJournal);
                     // La simulation du click sur le bouton btNPRefresh permet d'avoir une actualisation directement aprés la création sans que l'utilisateur n'ai à appuyer sur le bouton
                     btNPRefresh.PerformClick();
                 }
@@ -385,7 +377,7 @@ namespace Edito
         private void InitializeBinding()
         {
             #region Binding Article
-            
+
             _articles = new BindingList<Article>();
             bsArticles.DataSource = _articles;
             dgvArticles.DataSource = bsArticles;

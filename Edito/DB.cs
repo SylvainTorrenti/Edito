@@ -17,7 +17,7 @@ namespace Edito
         public DB()
         {
             _dbConnection = new(Settings.Default.EditoConnectionString);
-        } 
+        }
         #endregion
         #region Articles
         /// <summary>
@@ -83,39 +83,19 @@ namespace Edito
         /// </summary>
         /// <param name="id">L'id de l'article à supprimer</param>
         /// <returns></returns>
-        public int DeleteArticle(int id)
+        public int DeleteArticleIfNotExist(int id)
         {
             try
             {
                 _dbConnection.Open();
                 //Suprression de l'article selectionné 
-                var q = "DELETE from article WHERE IDArticle = @id";
+                var q = "DELETE from article WHERE IDArticle = @id AND NOT EXISTS (SELECT IDArticle from composition WHERE IDArticle = @id)";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { id }"
                 var result = _dbConnection.Execute(q, new { id });
                 return result;
             }
             finally { _dbConnection.Close(); }
         }
-        /// <summary>
-        /// Verification si l'article est contenu dans un journal pour limiter la suppression
-        /// </summary>
-        /// <param name="id">L'id de l'article</param>
-        /// <returns>Le nombre de COUNT (d'occurence du champ selectionné) dans la table composition</returns>
-        public long ArticleIsPresent(int id)
-        {
-            try
-            {
-                _dbConnection.Open();
-                //Compte le nombre d'occurence du champs "IDArticle" pour verifier si l'article selectionné est lié à un/des journal/journaux
-                var q = "SELECT COUNT(c.IDArticle) from composition c join article a ON c.IDArticle = a.IDArticle WHERE a.IDArticle = @id;";
-                //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { id }"
-                var result = _dbConnection.ExecuteScalar(q, new { id });
-                //Cast result en Long pour correspondre au retour nescessaire
-                return (long)result;
-            }
-            finally { _dbConnection.Close(); }
-        }
-
         #endregion Articles
         #region NewsPaper
         /// <summary>
@@ -182,36 +162,23 @@ namespace Edito
         /// </summary>
         /// <param name="IDNewsPaper">Id du journal à supprimer</param>
         /// <returns></returns>
-        public int DeleteNewsPaper(int IDNewsPaper)
+        public int DeleteNewsPaperCascade(int IDNewsPaper)
         {
             try
             {
                 _dbConnection.Open();
-                //Suprression du journal selectionné 
-                var sql = "DELETE FROM journal WHERE IDJournal = @IDNewsPaper;";
-                return _dbConnection.Execute(sql, new { IDNewsPaper });
-            }
-            finally
-            {
-                _dbConnection.Close();
-            }
-        }
-        /// <summary>
-        /// Verfication si le journal à supprimer contient un/des article(s)
-        /// </summary>
-        /// <param name="IDNewsPaper">Id du journal à verifier</param>
-        /// <returns></returns>
-        public long NewsPaperIspresent(int IDNewsPaper)
-        {
-            try
-            {
-                _dbConnection.Open();
-                //Compte le nombre d'occurence du champs "IDJournal" pour verifier si le journal selectionné est lié à un/des article(s)
-                var q = "SELECT COUNT(c.IDJournal) FROM composition c join journal j ON c.IDJournal = j.IDJournal WHERE j.IDJournal = @IDNewsPaper;";
-                //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { IDNewsPaper }"
-                var result = _dbConnection.ExecuteScalar(q, new { IDNewsPaper });
-                //Cast result en Long pour correspondre au retour nescessaire
-                return (long)result;
+                using (var tran = _dbConnection.BeginTransaction())
+                {
+                    var sql = "DELETE FROM composition WHERE IDJournal = @IDNewsPaper";
+                    var result = _dbConnection.Execute(sql, new { IDNewsPaper }, tran);
+
+                    sql = "DELETE FROM journal WHERE IDJournal = @IDNewsPaper;";
+                    result = _dbConnection.Execute(sql, new { IDNewsPaper }, tran);
+
+                    tran.Commit();
+
+                    return result;
+                }
             }
             finally
             {
