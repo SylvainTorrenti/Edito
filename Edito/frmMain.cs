@@ -149,7 +149,7 @@ namespace Edito
         {
             // creation du current
             NewsPaper current = bsArticles.Current as NewsPaper;
-            // Remplissage de la liste de journaux
+            // Remplissage de la liste des journaux
             _newsPapers.Clear();
             var NewsPaper = _db.GetNewsPapers();
             foreach (NewsPaper j in NewsPaper)
@@ -162,7 +162,7 @@ namespace Edito
             _associations.Clear();
             foreach (Association a in asso)
                 _associations.Add(a);
-            // Remplissage de la liste d'article
+            // Remplissage de la liste d'articles
             NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
             Article currentArticle = bsArticles.Current as Article;
             var articles = _db.GetArticles();
@@ -189,7 +189,7 @@ namespace Edito
             // Verification du check du Date Time Picker
             if (dtpNewsPaper.Checked == true)
             {
-                // Un message avec un récapitulatife des information demande à l'utilisateur la validation de la creation 
+                // Un message avec un récapitulatife des informations demandées à l'utilisateur la validation de la creation 
                 if (MessageBox.Show($"Confirmer la creation du journal \n nom : {tbxTitleNewsPaper.Text} \n date de parution {dtpNewsPaper.Text}", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     // appel de la fonction InsertNewsPaper avec les information requise
@@ -295,7 +295,7 @@ namespace Edito
         {
             // creation du current NewsPaper
             NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
-            // Verifie que la current n'est pas null
+            // Verifie que le current n'est pas null
             if (currentNP is not null)
             {
                 // supprime les éléments present dans les liste _articles et _articlesInNewspaper
@@ -307,13 +307,13 @@ namespace Edito
                     // Les ajoute à la liste _articlesInNewspaper
                     _articlesInNewspaper.Add(article);
                 _articles.Clear();
-                // creation du curren Article
+                // creation du current Article
                 Article currentArticle = bsArticles.Current as Article;
                 var articles = _db.GetArticles();
                 foreach (Article a in articles)
                     if (currentNP is not null)
                     {
-                        // ajoute les article dans _articles si il ne sont pas deja present
+                        // ajoute les article dans _articles si ils ne sont pas deja present dans le journal selectionné
                         if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
                         {
                             _articles.Add(a);
