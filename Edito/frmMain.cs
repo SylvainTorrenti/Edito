@@ -284,7 +284,7 @@ namespace Edito
                 // Message de confirmation de la supression du journal
                 if (MessageBox.Show($"Accepter la suppression du journal {current.Titre} ?", "Suprression", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
-                    // Si lu'itlisateur decide de le supprimer alors il y a verification qu'il ne posséde pas des articles
+                    // Supression du journal dans la table composition & journal
                     _db.DeleteNewsPaperCascade(current.IDJournal);
                     // La simulation du click sur le bouton btNPRefresh permet d'avoir une actualisation directement aprés la création sans que l'utilisateur n'ai à appuyer sur le bouton
                     btNPRefresh.PerformClick();
@@ -365,13 +365,13 @@ namespace Edito
                     // supprime l'association entre l'article et le journal dans _associations
                     _associations.Remove(currentAsso);
                     // ajoute l'article supprimé de la liste des article dans la journal dans la liste des articles
-                    _articles.Add(currentArticle);
-                    // Positionement sur le journal
-                    bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
+                    _articles.Add(currentArticle);                  
                 }
             }
             // La simulation du click sur le bouton btNPRefresh permet d'avoir une actualisation directement aprés la création sans que l''utilisateur n'ai à appuyer sur le bouton
             btNPRefresh.PerformClick();
+            // Positionement sur le journal
+            bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
         }
         #endregion
         private void InitializeBinding()

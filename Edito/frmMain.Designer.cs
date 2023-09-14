@@ -71,14 +71,10 @@
             label5 = new Label();
             label6 = new Label();
             btNPRefresh = new Button();
-            tabCompositions = new TabPage();
             bsArticles = new BindingSource(components);
             bsNewsPaper = new BindingSource(components);
             bsArticleInNewspaper = new BindingSource(components);
             bsAsso = new BindingSource(components);
-            tlpView = new TableLayoutPanel();
-            dgvView = new DataGridView();
-            bsView = new BindingSource(components);
             tlpMain.SuspendLayout();
             tabEdito.SuspendLayout();
             tabArticles.SuspendLayout();
@@ -98,14 +94,10 @@
             tlpSecondNewsPaper.SuspendLayout();
             flpNPButton.SuspendLayout();
             tlpBoxNP.SuspendLayout();
-            tabCompositions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)bsArticles).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).BeginInit();
             ((System.ComponentModel.ISupportInitialize)bsAsso).BeginInit();
-            tlpView.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvView).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)bsView).BeginInit();
             SuspendLayout();
             // 
             // tlpMain
@@ -128,7 +120,6 @@
             tabEdito.Appearance = TabAppearance.FlatButtons;
             tabEdito.Controls.Add(tabArticles);
             tabEdito.Controls.Add(tabJournaux);
-            tabEdito.Controls.Add(tabCompositions);
             tabEdito.Dock = DockStyle.Fill;
             tabEdito.Location = new Point(1, 1);
             tabEdito.Margin = new Padding(1);
@@ -429,8 +420,8 @@
             // tlpMainArticle
             // 
             tlpMainArticle.ColumnCount = 2;
-            tlpMainArticle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 78.7528839F));
-            tlpMainArticle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 21.2471123F));
+            tlpMainArticle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 73.4375F));
+            tlpMainArticle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 26.5625F));
             tlpMainArticle.Controls.Add(btAddArticle, 1, 0);
             tlpMainArticle.Controls.Add(gbxAddArticle, 0, 0);
             tlpMainArticle.Controls.Add(gbxDeleteArticle, 0, 1);
@@ -448,13 +439,13 @@
             // 
             btAddArticle.Anchor = AnchorStyles.None;
             btAddArticle.Image = Properties.Resources.Ajouter;
-            btAddArticle.ImageAlign = ContentAlignment.MiddleLeft;
-            btAddArticle.Location = new Point(355, 72);
+            btAddArticle.ImageAlign = ContentAlignment.BottomCenter;
+            btAddArticle.Location = new Point(332, 59);
             btAddArticle.Name = "btAddArticle";
-            btAddArticle.Size = new Size(90, 48);
+            btAddArticle.Size = new Size(113, 75);
             btAddArticle.TabIndex = 2;
-            btAddArticle.Text = "Ajouter";
-            btAddArticle.TextAlign = ContentAlignment.MiddleRight;
+            btAddArticle.Text = "Ajouter au journal";
+            btAddArticle.TextAlign = ContentAlignment.TopCenter;
             btAddArticle.UseVisualStyleBackColor = true;
             btAddArticle.Click += btAddArticle_Click;
             // 
@@ -464,7 +455,7 @@
             gbxAddArticle.Dock = DockStyle.Fill;
             gbxAddArticle.Location = new Point(3, 3);
             gbxAddArticle.Name = "gbxAddArticle";
-            gbxAddArticle.Size = new Size(346, 187);
+            gbxAddArticle.Size = new Size(323, 187);
             gbxAddArticle.TabIndex = 4;
             gbxAddArticle.TabStop = false;
             gbxAddArticle.Text = "Sélectionnez un article à ajouter";
@@ -484,7 +475,7 @@
             dgvAddArticle.RowHeadersVisible = false;
             dgvAddArticle.RowTemplate.Height = 25;
             dgvAddArticle.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvAddArticle.Size = new Size(340, 165);
+            dgvAddArticle.Size = new Size(317, 165);
             dgvAddArticle.TabIndex = 0;
             // 
             // gbxDeleteArticle
@@ -493,7 +484,7 @@
             gbxDeleteArticle.Dock = DockStyle.Fill;
             gbxDeleteArticle.Location = new Point(3, 196);
             gbxDeleteArticle.Name = "gbxDeleteArticle";
-            gbxDeleteArticle.Size = new Size(346, 188);
+            gbxDeleteArticle.Size = new Size(323, 188);
             gbxDeleteArticle.TabIndex = 5;
             gbxDeleteArticle.TabStop = false;
             gbxDeleteArticle.Text = "Sélectionnez un article à supprimer";
@@ -513,20 +504,20 @@
             dgvDeleteArticle.RowHeadersVisible = false;
             dgvDeleteArticle.RowTemplate.Height = 25;
             dgvDeleteArticle.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvDeleteArticle.Size = new Size(340, 166);
+            dgvDeleteArticle.Size = new Size(317, 166);
             dgvDeleteArticle.TabIndex = 0;
             // 
             // btDeleteArticle
             // 
             btDeleteArticle.Anchor = AnchorStyles.None;
             btDeleteArticle.Image = Properties.Resources.Supprimer;
-            btDeleteArticle.ImageAlign = ContentAlignment.MiddleLeft;
-            btDeleteArticle.Location = new Point(355, 266);
+            btDeleteArticle.ImageAlign = ContentAlignment.BottomCenter;
+            btDeleteArticle.Location = new Point(332, 252);
             btDeleteArticle.Name = "btDeleteArticle";
-            btDeleteArticle.Size = new Size(90, 48);
+            btDeleteArticle.Size = new Size(113, 75);
             btDeleteArticle.TabIndex = 3;
-            btDeleteArticle.Text = "Supprimer";
-            btDeleteArticle.TextAlign = ContentAlignment.MiddleRight;
+            btDeleteArticle.Text = "Supprimer du journal";
+            btDeleteArticle.TextAlign = ContentAlignment.TopCenter;
             btDeleteArticle.UseVisualStyleBackColor = true;
             btDeleteArticle.Click += btDeleteArticle_Click;
             // 
@@ -666,48 +657,9 @@
             btNPRefresh.UseVisualStyleBackColor = true;
             btNPRefresh.Click += btNPRefresh_Click;
             // 
-            // tabCompositions
-            // 
-            tabCompositions.BackColor = SystemColors.Control;
-            tabCompositions.Controls.Add(tlpView);
-            tabCompositions.Location = new Point(4, 27);
-            tabCompositions.Margin = new Padding(1);
-            tabCompositions.Name = "tabCompositions";
-            tabCompositions.Padding = new Padding(1);
-            tabCompositions.Size = new Size(880, 536);
-            tabCompositions.TabIndex = 2;
-            tabCompositions.Text = "Compositions";
-            // 
             // bsNewsPaper
             // 
             bsNewsPaper.PositionChanged += bsNewsPaper_PositionChanged;
-            // 
-            // tlpView
-            // 
-            tlpView.ColumnCount = 1;
-            tlpView.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tlpView.Controls.Add(dgvView, 0, 0);
-            tlpView.Dock = DockStyle.Fill;
-            tlpView.Location = new Point(1, 1);
-            tlpView.Name = "tlpView";
-            tlpView.RowCount = 1;
-            tlpView.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tlpView.Size = new Size(878, 534);
-            tlpView.TabIndex = 0;
-            // 
-            // dgvView
-            // 
-            dgvView.AllowUserToAddRows = false;
-            dgvView.AllowUserToDeleteRows = false;
-            dgvView.BackgroundColor = SystemColors.Control;
-            dgvView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvView.Dock = DockStyle.Fill;
-            dgvView.Location = new Point(3, 3);
-            dgvView.Name = "dgvView";
-            dgvView.ReadOnly = true;
-            dgvView.RowTemplate.Height = 25;
-            dgvView.Size = new Size(872, 528);
-            dgvView.TabIndex = 0;
             // 
             // frmMain
             // 
@@ -746,14 +698,10 @@
             flpNPButton.ResumeLayout(false);
             tlpBoxNP.ResumeLayout(false);
             tlpBoxNP.PerformLayout();
-            tabCompositions.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)bsArticles).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsNewsPaper).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsArticleInNewspaper).EndInit();
             ((System.ComponentModel.ISupportInitialize)bsAsso).EndInit();
-            tlpView.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgvView).EndInit();
-            ((System.ComponentModel.ISupportInitialize)bsView).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -761,15 +709,14 @@
         #endregion
 
         private TableLayoutPanel tlpMain;
+        private BindingSource bsArticles;
+        private BindingSource bsNewsPaper;
+        private BindingSource bsArticleInNewspaper;
+        private BindingSource bsAsso;
         private TabControl tabEdito;
         private TabPage tabArticles;
-        private TabPage tabJournaux;
-        private TabPage tabCompositions;
         private TableLayoutPanel tlpArticle;
         private DataGridView dgvArticles;
-        private FlowLayoutPanel flpButton;
-        private Button btArticleRefresh;
-        private BindingSource bsArticles;
         private TableLayoutPanel tlpBox;
         private Label label1;
         private Label label2;
@@ -777,20 +724,23 @@
         private TextBox tbxTitreArticle;
         private TextBox tbxCorpsArticle;
         private TextBox tbxAuteurArticle;
+        private FlowLayoutPanel flpButton;
+        private Button btArticleRefresh;
         private Button btArticleAdd;
         private Button btArticleUpdate;
         private Button btArticleDelete;
+        private TabPage tabJournaux;
         private TableLayoutPanel tlpMainNewsPaper;
         private TableLayoutPanel tlpDataGridView;
         private DataGridView dgvNewsPaper;
         private Label label4;
         private TableLayoutPanel tlpMainArticle;
         private Button btAddArticle;
-        private Button btDeleteArticle;
         private GroupBox gbxAddArticle;
         private DataGridView dgvAddArticle;
         private GroupBox gbxDeleteArticle;
         private DataGridView dgvDeleteArticle;
+        private Button btDeleteArticle;
         private TableLayoutPanel tlpSecondNewsPaper;
         private FlowLayoutPanel flpNPButton;
         private Button btAddNP;
@@ -799,14 +749,8 @@
         private TableLayoutPanel tlpBoxNP;
         private TextBox tbxTitleNewsPaper;
         private DateTimePicker dtpNewsPaper;
-        private Button btNPRefresh;
         private Label label5;
         private Label label6;
-        private BindingSource bsNewsPaper;
-        private BindingSource bsArticleInNewspaper;
-        private BindingSource bsAsso;
-        private TableLayoutPanel tlpView;
-        private DataGridView dgvView;
-        private BindingSource bsView;
+        private Button btNPRefresh;
     }
 }
