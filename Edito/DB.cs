@@ -12,6 +12,7 @@ namespace Edito
     internal class DB
     {
         private readonly MySqlConnection _dbConnection;
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
 
         #region Connection
         public DB()
@@ -28,12 +29,12 @@ namespace Edito
         {
             try
             {
-                await _dbConnection.OpenAsync();
+                await OpenConnection();
                 //Recuperation de tout les champs de la table article
                 var q = "SELECT * from article";
                 return await _dbConnection.QueryAsync<Article>(q);
             }
-            finally { await _dbConnection.CloseAsync(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// Ajoute un article
@@ -42,20 +43,20 @@ namespace Edito
         /// <param name="corps">Ce que l'article contient</param>
         /// <param name="auteur">L'auteur de l'article peut être null</param>
         /// <returns>L'id de l'article créé</returns>
-        public int InsertArticle(string titre, string corps, string auteur)
+        public async Task<int> InsertArticle(string titre, string corps, string auteur)
         {
             try
             {
-                _dbConnection.Open();
+                await OpenConnection();
                 //Insertion dans la table article avec comme valeur ce que nous avons fournit en paramétre
                 //Ajout d'une 2eme requête à la suite nous permettant de recuperer le dernier ID créé "SELECT LAST_INSERT_ID()"
                 var q = "INSERT INTO article (Titre,Corps,Auteur) VALUES (@titre, @corps, @auteur); SELECT LAST_INSERT_ID()";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { titre, corps, auteur }"
-                var result = _dbConnection.Query<int>(q, new { titre, corps, auteur });
+                var result = await _dbConnection.QueryAsync<int>(q, new { titre, corps, auteur });
                 //Return result.Single() car même si un seul ID est récuperer il le donne sous forme de liste et nous devons en récupérer qu'un seul pour pouvoir l'utiliser.
                 return result.Single();
             }
-            finally { _dbConnection.Close(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// Mise a jour d'un article
@@ -69,14 +70,14 @@ namespace Edito
         {
             try
             {
-                await _dbConnection.OpenAsync();
+                await OpenConnection();
                 //Modification de l'article selectionné avec comme valeur ce que nous avons fournit en paramétre
                 var q = "UPDATE article SET Titre = @titre, Corps = @corps, Auteur = @auteur WHERE IDArticle = @id";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { titre, corps, auteur }"
                 var result = await _dbConnection.ExecuteAsync(q, new { id, titre, corps, auteur });
                 return result;
             }
-            finally { await _dbConnection.CloseAsync(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// Suppression d'un article
@@ -87,14 +88,14 @@ namespace Edito
         {
             try
             {
-                await _dbConnection.OpenAsync();
+                await OpenConnection();
                 //Suprression de l'article selectionné 
                 var q = "DELETE from article WHERE IDArticle = @id AND NOT EXISTS (SELECT IDArticle from composition WHERE IDArticle = @id)";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { id }"
                 var result = await _dbConnection.ExecuteAsync(q, new { id });
                 return result;
             }
-            finally { await _dbConnection.CloseAsync(); }
+            finally { await CloseConnection(); }
         }
         #endregion Articles
         #region NewsPaper
@@ -106,12 +107,12 @@ namespace Edito
         {
             try
             {
-               await _dbConnection.OpenAsync();
+                await OpenConnection();
                 //Recuperation de tout les champs de la table article
                 var q = "SELECT * from journal";
                 return await _dbConnection.QueryAsync<NewsPaper>(q);
             }
-            finally { await _dbConnection.CloseAsync(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// ajoute un journal
@@ -119,20 +120,20 @@ namespace Edito
         /// <param name="Titre">Le titre du journal</param>
         /// <param name="DtParution">La date de parution du journal peut être null</param>
         /// <returns></returns>
-        public int InsertNewsPaper(string Titre, DateTime? DtParution)
+        public async Task<int> InsertNewsPaper(string Titre, DateTime? DtParution)
         {
             try
             {
-                _dbConnection.Open();
+                await OpenConnection();
                 //Insertion dans la table article avec comme valeur ce que nous avons fournit en paramétre
                 //Ajout d'une 2eme requête à la suite nous permettant de recuperer le dernier ID créé "SELECT LAST_INSERT_ID()"
                 var q = "INSERT INTO journal (Titre, DtParution) VALUES (@Titre, @DtParution); SELECT LAST_INSERT_ID() ";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { titre, corps, auteur }"
-                var result = _dbConnection.Query<int>(q, new { Titre, DtParution });
+                var result = await _dbConnection.QueryAsync<int>(q, new { Titre, DtParution });
                 //Return result.Single() car même si un seul ID est récuperer il le donne sous forme de liste et nous devons en récupérer qu'un seul pour pouvoir l'utiliser.
                 return result.Single();
             }
-            finally { _dbConnection.Close(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// Modification du journal
@@ -141,20 +142,20 @@ namespace Edito
         /// <param name="Titre">Titre du journal aprés modification</param>
         /// <param name="DtParution">Date de parution du journal aprés modification</param>
         /// <returns></returns>
-        public int UpdateNewsPaper(int IDNewsPaper, string Titre, DateTime? DtParution)
+        public async Task<int> UpdateNewsPaper(int IDNewsPaper, string Titre, DateTime? DtParution)
         {
             try
             {
-                _dbConnection.Open();
+                await OpenConnection();
                 //Modification du journal selectionné avec comme valeur ce que nous avons fournit en paramétre
                 var sql = "UPDATE journal SET Titre = @Titre, DtParution = @DtParution  WHERE IDJournal = @IDNewsPaper ;";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { titre, corps, auteur }"
-                return _dbConnection.Execute(sql, new { IDNewsPaper, Titre, DtParution });
+                return await _dbConnection.ExecuteAsync(sql, new { IDNewsPaper, Titre, DtParution });
 
             }
             finally
             {
-                _dbConnection.Close();
+                await CloseConnection();
             }
         }
         /// <summary>
@@ -162,18 +163,18 @@ namespace Edito
         /// </summary>
         /// <param name="IDNewsPaper">Id du journal à supprimer</param>
         /// <returns></returns>
-        public int DeleteNewsPaperCascade(int IDNewsPaper)
+        public async Task<int> DeleteNewsPaperCascade(int IDNewsPaper)
         {
             try
             {
-                _dbConnection.Open();
-                using (var tran = _dbConnection.BeginTransaction())
+                await OpenConnection();
+                using (var tran = await _dbConnection.BeginTransactionAsync())
                 {
                     var sql = "DELETE FROM composition WHERE IDJournal = @IDNewsPaper";
-                    var result = _dbConnection.Execute(sql, new { IDNewsPaper }, tran);
+                    var result = await _dbConnection.ExecuteAsync(sql, new { IDNewsPaper }, tran);
 
                     sql = "DELETE FROM journal WHERE IDJournal = @IDNewsPaper;";
-                    result = _dbConnection.Execute(sql, new { IDNewsPaper }, tran);
+                    result = await _dbConnection.ExecuteAsync(sql, new { IDNewsPaper }, tran);
 
                     tran.Commit();
 
@@ -182,7 +183,7 @@ namespace Edito
             }
             finally
             {
-                _dbConnection.Close();
+                await CloseConnection();
             }
         }
         #endregion
@@ -195,12 +196,12 @@ namespace Edito
         {
             try
             {
-                await _dbConnection.OpenAsync();
+                await OpenConnection();
                 //Recuperation de tout les champs de la table composition
                 var q = "SELECT * from composition;";
                 return await _dbConnection.QueryAsync<Association>(q);
             }
-            finally { await _dbConnection.CloseAsync(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// Récupére les articles present dans les journaux
@@ -211,12 +212,12 @@ namespace Edito
         {
             try
             {
-               await _dbConnection.OpenAsync();
+                await OpenConnection();
                 // récupére les champs : "IDArticle" , "Titre" , "Corps" , "Auteur" de la table article qui sont lié au journal fournit par l'IDJournal donné
                 var q = "SELECT a.IDArticle , a.Titre , a.Corps , a.Auteur from article a join composition c on a.IDArticle = c.IDArticle join journal j on j.IDJournal = c.IDJournal WHERE c.IDJournal = @id";
                 return await _dbConnection.QueryAsync<Article>(q, new { id });
             }
-            finally { await _dbConnection.CloseAsync(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// Insertion de l'article dans la journal
@@ -224,17 +225,17 @@ namespace Edito
         /// <param name="idNP">L'identifiant du journal selectionné</param>
         /// <param name="idArticle">L'identifiant de l'article selectionné</param>
         /// <returns>Un int pour verifier que la requête c'est effectué correctement</returns>
-        public int InsertArticleInNewsPaper(int idNP, int idArticle)
+        public async Task<int> InsertArticleInNewsPaper(int idNP, int idArticle)
         {
             try
             {
-                _dbConnection.Open();
+                await OpenConnection();
                 //Insert dans la table composition la liaison entre l'article et le journal donné grace à idNP et idArticle
                 var q = "INSERT INTO composition (IDJournal, IDArticle) VALUES (@idNP, @idArticle);";
-                return _dbConnection.Execute(q, new { idNP, idArticle });
+                return await _dbConnection.ExecuteAsync(q, new { idNP, idArticle });
 
             }
-            finally { _dbConnection.Close(); }
+            finally { await CloseConnection(); }
         }
         /// <summary>
         /// Suppression de l'association entre l'article et le journal dans la table composition
@@ -242,18 +243,30 @@ namespace Edito
         /// <param name="idNP">L'identifiant du journal selectionné</param>
         /// <param name="idArticle">L'identifiant de l'article selectionné</param>
         /// <returns>Un int pour verifier que la requête c'est effectué correctement</returns>
-        public int DelteArticleInNewsPaper(int idNP, int idArticle)
+        public async Task<int> DelteArticleInNewsPaper(int idNP, int idArticle)
         {
             try
             {
-                _dbConnection.Open();
+                await OpenConnection();
                 //Supprime la liaison entre l'article et le journal grâce au Id donné 
                 var q = "DELETE FROM composition WHERE IDJournal = @idNP AND IDArticle = @idArticle;";
-                return _dbConnection.Execute(q, new { idNP, idArticle });
+                return await _dbConnection.ExecuteAsync(q, new { idNP, idArticle });
 
             }
-            finally { _dbConnection.Close(); }
+            finally { await CloseConnection(); }
         }
         #endregion
+
+        private async Task OpenConnection()
+        {
+            await _semaphore.WaitAsync();
+            await _dbConnection.OpenAsync();
+        }
+
+        private async Task CloseConnection()
+        {
+            await _dbConnection.CloseAsync();
+            _semaphore.Release();
+        }
     }
 }

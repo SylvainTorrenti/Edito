@@ -42,11 +42,11 @@ namespace Edito
             if (tabEdito.SelectedTab == tabArticles)
             {
 
-                PerformRefreshArticles();
+                RefreshArticles();
             }
             if (tabEdito.SelectedTab == tabJournaux)
             {
-                PerformRefreshNP();
+                RefreshNP();
             }
         }
         #endregion
@@ -54,18 +54,9 @@ namespace Edito
 
         private async void btArticleActualiser_Click(object sender, EventArgs e)
         {
-            // creation du current
-            Article current = bsArticles.Current as Article;
-            // Remplissage de la liste
-            _articles.Clear();
-            var articles = await _db.GetArticlesAsync();
-            foreach (Article a in articles)
-                _articles.Add(a);
-            // On se repositionne sur le current
-            if (current is not null)
-                bsArticles.Position = _articles.IndexOf(_articles.Where(u => u.IdArticle == current.IdArticle).FirstOrDefault());
+            RefreshArticles();
         }
-        private async void PerformRefreshArticles()
+        private async void RefreshArticles()
         {
             // creation du current
             Article current = bsArticles.Current as Article;
@@ -79,7 +70,7 @@ namespace Edito
                 bsArticles.Position = _articles.IndexOf(_articles.Where(u => u.IdArticle == current.IdArticle).FirstOrDefault());
         }
 
-        private void btArticleAjouter_Click(object sender, EventArgs e)
+        private async void btArticleAjouter_Click(object sender, EventArgs e)
         {
             //Condition qui verifie que l'article n'existe pas déjà
             if (_articles.Where(article => article.Titre == tbxTitreArticle.Text && article.Auteur == tbxAuteurArticle.Text && article.Corps == tbxCorpsArticle.Text).Count() >= 1 || _articles.Where(article => article.Titre == tbxTitreArticle.Text && article.Auteur == null && article.Corps == tbxCorpsArticle.Text).Count() >= 1)
@@ -91,8 +82,8 @@ namespace Edito
             if (MessageBox.Show($"Confirmer la creation de l'article \n nom : {tbxTitreArticle.Text} \n corps : {tbxCorpsArticle.Text} \n auteur : {tbxAuteurArticle.Text}", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
                 // Si l'utilisateur répond positivement l'article est créé avec les information fournit
-                var iDArticle = _db.InsertArticle(tbxTitreArticle.Text, tbxCorpsArticle.Text, tbxAuteurArticle.Text);
-                PerformRefreshArticles();
+                var iDArticle = await _db.InsertArticle(tbxTitreArticle.Text, tbxCorpsArticle.Text, tbxAuteurArticle.Text);
+                RefreshArticles();
                 // Positionement sur l'article qui vient d'être créé
                 bsArticles.Position = _articles.IndexOf(_articles.Where(u => u.IdArticle == iDArticle).FirstOrDefault());
                 return;
@@ -109,7 +100,7 @@ namespace Edito
                 // Requête classique de modification avec une ternaire sur l'auteur car il peut être null
                 var nb = await _db.UpdateArticleAsync(current.IdArticle, tbxTitreArticle.Text, tbxCorpsArticle.Text, string.IsNullOrWhiteSpace(tbxAuteurArticle.Text) ? null : tbxAuteurArticle.Text);
                 // La simulation du click sur le bouton btArticleRefresh permet d'avoir une actualisation directement aprés la création sans que l''utilisateur n'ai à appuyer sur le bouton
-                PerformRefreshArticles();
+                RefreshArticles();
             }
         }
 
@@ -131,7 +122,7 @@ namespace Edito
                         return;
                     }
                     // La simulation du click sur le bouton btArticleRefresh permet d'avoir une actualisation directement aprés la création sans que l''utilisateur n'ai à appuyer sur le bouton
-                    PerformRefreshArticles();
+                    RefreshArticles();
                 }
             }
 
@@ -141,39 +132,9 @@ namespace Edito
         #region NewsPaper
         private async void btNPRefresh_Click(object sender, EventArgs e)
         {
-            // creation du current
-            NewsPaper current = bsArticles.Current as NewsPaper;
-            // Remplissage de la liste des journaux
-            _newsPapers.Clear();
-            var NewsPaper = await _db.GetNewsPapersAsync();
-            foreach (NewsPaper j in NewsPaper)
-                _newsPapers.Add(j);
-            // On se repositionne sur le current
-            if (current is not null)
-                bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == current.IDJournal).FirstOrDefault());
-            // Remplissage de la liste d'association
-            _associations.Clear();
-            await Task.Delay(1000);
-            var asso = await _db.GetArticlesAssoAsync();
-            foreach (Association a in asso)
-                _associations.Add(a);
-            // Remplissage de la liste d'articles
-            NewsPaper currentNP = bsNewsPaper.Current as NewsPaper;
-            Article currentArticle = bsArticles.Current as Article;
-            var articles = await _db.GetArticlesAsync();
-            _articles.Clear();
-            // on verifie que currentNP n'est pas null
-            if (currentNP is not null)
-            {
-                foreach (Article a in articles)
-                    // Pour chaque Article on verifie sa presence dans le journal selectionné grâce à la liste _association
-                    if (_associations.Where(id => id.IDJournal == currentNP.IDJournal && id.IdArticle == a.IdArticle).Count() < 1)
-                    {
-                        _articles.Add(a);
-                    }
-            }
+            RefreshNP();
         }
-        private async void PerformRefreshNP()
+        private async void RefreshNP()
         {
             // creation du current
             NewsPaper current = bsArticles.Current as NewsPaper;
@@ -187,7 +148,6 @@ namespace Edito
                 bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == current.IDJournal).FirstOrDefault());
             // Remplissage de la liste d'association
             _associations.Clear();
-            await Task.Delay(1000);
             var asso = await _db.GetArticlesAssoAsync();
             foreach (Association a in asso)
                 _associations.Add(a);
@@ -207,7 +167,7 @@ namespace Edito
                     }
             }
         }
-        private void btAddNP_Click(object sender, EventArgs e)
+        private async void btAddNP_Click(object sender, EventArgs e)
         {
             // Verifie si le journal qui doit être créé existe déjà
             if (_newsPapers.Where(newspaper => newspaper.Titre == tbxTitleNewsPaper.Text && newspaper.DtParution == dtpNewsPaper.Value).Count() >= 1 || _newsPapers.Where(newspaper => newspaper.Titre == tbxTitleNewsPaper.Text && newspaper.DtParution == null).Count() >= 1)
@@ -222,12 +182,12 @@ namespace Edito
                 if (MessageBox.Show($"Confirmer la creation du journal \n nom : {tbxTitleNewsPaper.Text} \n date de parution {dtpNewsPaper.Text}", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
                     // appel de la fonction InsertNewsPaper avec les information requise
-                    var idNewsPaper = _db.InsertNewsPaper(tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
+                    var idNewsPaper = await _db.InsertNewsPaper(tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
 
-                    PerformRefreshNP();
 
                     // Positionement sur le journal qui vient d'être créé
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == idNewsPaper).FirstOrDefault());
+                    RefreshNP();
                     return;
                 }
             }
@@ -236,16 +196,16 @@ namespace Edito
             {
                 if (MessageBox.Show($"Confirmer la creation du journal \n nom : {tbxTitleNewsPaper.Text} \n sans date de parution", "Creation", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
-                    var idNewsPaper = _db.InsertNewsPaper(tbxTitleNewsPaper.Text, null);
+                    var idNewsPaper = await _db.InsertNewsPaper(tbxTitleNewsPaper.Text, null);
 
-                    PerformRefreshNP();
+                    RefreshNP();
 
                     bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == idNewsPaper).FirstOrDefault());
                     return;
                 }
             }
         }
-        private void btUpdateNP_Click(object sender, EventArgs e)
+        private async void btUpdateNP_Click(object sender, EventArgs e)
         {
             // creation du current
             NewsPaper current = bsNewsPaper.Current as NewsPaper;
@@ -261,7 +221,7 @@ namespace Edito
                         if (current.DtParution == null)
                         {
                             //Verification de l'execution de la requête
-                            var nb2 = _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
+                            var nb2 =await _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
                             if (nb2 == 1)
                             {
                                 // Mise en place d'un message recapitulatif selon le check du Date Time Picker
@@ -276,11 +236,11 @@ namespace Edito
                                     MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n Date de parution : Sans date", "Modifications effectuées");
                                 }
 
-                                PerformRefreshNP();
+                                RefreshNP();
 
                             }
                         }
-                        var nb = _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
+                        var nb =await _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
                         if (nb == 1)
                         {
                             if (dtpNewsPaper.Checked == true)
@@ -294,18 +254,18 @@ namespace Edito
                                 MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n Date de parution : Sans date", "Modifications effectuées");
                             }
 
-                            PerformRefreshNP();
+                            RefreshNP();
                         }
                     }
                     else if (dtpNewsPaper.Checked == false)
                     {
-                        var nb = _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, null);
+                        var nb =await _db.UpdateNewsPaper(current.IDJournal, tbxTitleNewsPaper.Text, null);
                         if (nb == 1)
                         {
                             MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n Date de parution : Sans date", "Modifications effectuées");
                         }
 
-                        PerformRefreshNP();
+                        RefreshNP();
                     }
             }
         }
@@ -322,7 +282,7 @@ namespace Edito
                     // Supression du journal dans la table composition & journal
                     _db.DeleteNewsPaperCascade(current.IDJournal);
 
-                    PerformRefreshNP();
+                    RefreshNP();
                 }
             }
         }
@@ -374,7 +334,7 @@ namespace Edito
                 // suprression de l'article dans _articles
                 _articles.Remove(currentArticle);
 
-                PerformRefreshNP();
+                RefreshNP();
 
                 // Positionement sur le journal
                 bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
@@ -405,7 +365,7 @@ namespace Edito
                 }
             }
 
-            PerformRefreshNP();
+            RefreshNP();
 
             // Positionement sur le journal
             bsNewsPaper.Position = _newsPapers.IndexOf(_newsPapers.Where(j => j.IDJournal == currentNP.IDJournal).FirstOrDefault());
