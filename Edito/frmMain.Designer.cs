@@ -659,7 +659,7 @@
             // 
             // bsNewsPaper
             // 
-            bsNewsPaper.PositionChanged += bsNewsPaper_PositionChanged;
+            bsNewsPaper.CurrentChanged += bsNewsPaper_CurrentChanged;
             // 
             // frmMain
             // 

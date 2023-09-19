@@ -24,16 +24,16 @@ namespace Edito
         /// Récupére les articles
         /// </summary>
         /// <returns>IEnuerable d'Article</returns>
-        public IEnumerable<Article> GetArticles()
+        public async Task<IEnumerable<Article>> GetArticlesAsync()
         {
             try
             {
-                _dbConnection.Open();
+                await _dbConnection.OpenAsync();
                 //Recuperation de tout les champs de la table article
                 var q = "SELECT * from article";
-                return _dbConnection.Query<Article>(q);
+                return await _dbConnection.QueryAsync<Article>(q);
             }
-            finally { _dbConnection.Close(); }
+            finally { await _dbConnection.CloseAsync(); }
         }
         /// <summary>
         /// Ajoute un article
@@ -65,36 +65,36 @@ namespace Edito
         /// <param name="corps">Le contenu aprés modification</param>
         /// <param name="auteur">L'auteur aprés modification</param>
         /// <returns></returns>
-        public int UpdateArticle(int id, string titre, string corps, string auteur)
+        public async Task<int> UpdateArticleAsync(int id, string titre, string corps, string auteur)
         {
             try
             {
-                _dbConnection.Open();
+                await _dbConnection.OpenAsync();
                 //Modification de l'article selectionné avec comme valeur ce que nous avons fournit en paramétre
                 var q = "UPDATE article SET Titre = @titre, Corps = @corps, Auteur = @auteur WHERE IDArticle = @id";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { titre, corps, auteur }"
-                var result = _dbConnection.Execute(q, new { id, titre, corps, auteur });
+                var result = await _dbConnection.ExecuteAsync(q, new { id, titre, corps, auteur });
                 return result;
             }
-            finally { _dbConnection.Close(); }
+            finally { await _dbConnection.CloseAsync(); }
         }
         /// <summary>
         /// Suppression d'un article
         /// </summary>
         /// <param name="id">L'id de l'article à supprimer</param>
         /// <returns></returns>
-        public int DeleteArticleIfNotExist(int id)
+        public async Task<int> DeleteArticleIfNotExistAsync(int id)
         {
             try
             {
-                _dbConnection.Open();
+                await _dbConnection.OpenAsync();
                 //Suprression de l'article selectionné 
                 var q = "DELETE from article WHERE IDArticle = @id AND NOT EXISTS (SELECT IDArticle from composition WHERE IDArticle = @id)";
                 //Execution de la requête grâce à "q" et Passage des valeurs voulues grâce à "new { id }"
-                var result = _dbConnection.Execute(q, new { id });
+                var result = await _dbConnection.ExecuteAsync(q, new { id });
                 return result;
             }
-            finally { _dbConnection.Close(); }
+            finally { await _dbConnection.CloseAsync(); }
         }
         #endregion Articles
         #region NewsPaper
@@ -102,16 +102,16 @@ namespace Edito
         /// Recuperation des journaux
         /// </summary>
         /// <returns>IEnumerable de NewsPaper</returns>
-        public IEnumerable<NewsPaper> GetNewsPapers()
+        public async Task<IEnumerable<NewsPaper>> GetNewsPapersAsync()
         {
             try
             {
-                _dbConnection.Open();
+               await _dbConnection.OpenAsync();
                 //Recuperation de tout les champs de la table article
                 var q = "SELECT * from journal";
-                return _dbConnection.Query<NewsPaper>(q);
+                return await _dbConnection.QueryAsync<NewsPaper>(q);
             }
-            finally { _dbConnection.Close(); }
+            finally { await _dbConnection.CloseAsync(); }
         }
         /// <summary>
         /// ajoute un journal
@@ -191,32 +191,32 @@ namespace Edito
         /// Récupére les association entre les articles et les journaux
         /// </summary>
         /// <returns>IEnumerable d'Association</returns>
-        public IEnumerable<Association> GetArticlesAsso()
+        public async Task<IEnumerable<Association>> GetArticlesAssoAsync()
         {
             try
             {
-                _dbConnection.Open();
+                await _dbConnection.OpenAsync();
                 //Recuperation de tout les champs de la table composition
                 var q = "SELECT * from composition;";
-                return _dbConnection.Query<Association>(q);
+                return await _dbConnection.QueryAsync<Association>(q);
             }
-            finally { _dbConnection.Close(); }
+            finally { await _dbConnection.CloseAsync(); }
         }
         /// <summary>
         /// Récupére les articles present dans les journaux
         /// </summary>
         /// <param name="id">Id du journal selectionné</param>
         /// <returns>IEnumerable d'Article</returns>
-        public IEnumerable<Article> GetArticlesInNewspaper(int id)
+        public async Task<IEnumerable<Article>> GetArticlesInNewspaperAsync(int id)
         {
             try
             {
-                _dbConnection.Open();
+               await _dbConnection.OpenAsync();
                 // récupére les champs : "IDArticle" , "Titre" , "Corps" , "Auteur" de la table article qui sont lié au journal fournit par l'IDJournal donné
                 var q = "SELECT a.IDArticle , a.Titre , a.Corps , a.Auteur from article a join composition c on a.IDArticle = c.IDArticle join journal j on j.IDJournal = c.IDJournal WHERE c.IDJournal = @id";
-                return _dbConnection.Query<Article>(q, new { id });
+                return await _dbConnection.QueryAsync<Article>(q, new { id });
             }
-            finally { _dbConnection.Close(); }
+            finally { await _dbConnection.CloseAsync(); }
         }
         /// <summary>
         /// Insertion de l'article dans la journal
