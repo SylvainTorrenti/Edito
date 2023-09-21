@@ -54,7 +54,7 @@ namespace Edito
 
         private async void btArticleActualiser_Click(object sender, EventArgs e)
         {
-           await RefreshArticles();
+            await RefreshArticles();
         }
         private async Task RefreshArticles()
         {
@@ -221,7 +221,7 @@ namespace Edito
                         if (current.DtParution == null)
                         {
                             //Verification de l'execution de la requête
-                            var nb2 =await _db.UpdateNewsPaperAsync(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
+                            var nb2 = await _db.UpdateNewsPaperAsync(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
                             if (nb2 == 1)
                             {
                                 // Mise en place d'un message recapitulatif selon le check du Date Time Picker
@@ -240,7 +240,7 @@ namespace Edito
 
                             }
                         }
-                        var nb =await _db.UpdateNewsPaperAsync(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
+                        var nb = await _db.UpdateNewsPaperAsync(current.IDJournal, tbxTitleNewsPaper.Text, dtpNewsPaper.Value);
                         if (nb == 1)
                         {
                             if (dtpNewsPaper.Checked == true)
@@ -259,7 +259,7 @@ namespace Edito
                     }
                     else if (dtpNewsPaper.Checked == false)
                     {
-                        var nb =await _db.UpdateNewsPaperAsync(current.IDJournal, tbxTitleNewsPaper.Text, null);
+                        var nb = await _db.UpdateNewsPaperAsync(current.IDJournal, tbxTitleNewsPaper.Text, null);
                         if (nb == 1)
                         {
                             MessageBox.Show($"Les modifications du journal {current.Titre} ont étaient effectuées. \n Maintenant elles sont : \n Nom : {tbxTitleNewsPaper.Text} \n Date de parution : Sans date", "Modifications effectuées");
